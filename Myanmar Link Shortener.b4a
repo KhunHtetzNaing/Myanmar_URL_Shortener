@@ -1,0 +1,268 @@
+﻿Version=6.8
+NumberOfModules=3
+Module1=Finished
+Module2=Ab0ut
+Module3=Starter
+Build1=Default,com.htetznaing.mmurlshortener
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="5" android:targetSdkVersion="19"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~'End of default text.~\n~~\n~'************ Google Play Services Base ************~\n~AddApplicationText(~\n~   <activity android:name="com.google.android.gms.common.api.GoogleApiActivity"~\n~  android:theme="@android:style/Theme.Translucent.NoTitleBar"~\n~  android:exported="false"/>~\n~    <meta-data~\n~  android:name="com.google.android.gms.version"~\n~  android:value="@integer/google_play_services_version" />~\n~)~\n~~\n~'************ Google Play Services Base (end) ************~\n~~\n~'************ Firebase Ads ************~\n~AddApplicationText(~\n~  <activity~\n~  android:name="com.google.android.gms.ads.AdActivity"~\n~  android:configChanges="keyboard|keyboardHidden|orientation|screenLayout|uiMode|screenSize|smallestScreenSize"~\n~  android:theme="@android:style/Theme.Translucent" />~\n~  <activity android:name="com.google.android.gms.ads.purchase.InAppPurchaseActivity"~\n~  android:theme="@style/Theme.IAPTheme"/>~\n~)~\n~'************ Firebase Ads (end) ************
+IconFile=
+NumberOfFiles=4
+File1=about.png
+File2=fb.png
+File3=icon.png
+File4=share.png
+NumberOfLibraries=6
+Library1=core
+Library2=clipboard
+Library3=firebaseadmob
+Library4=httputils2
+Library5=phone
+Library6=stringutils
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: Myanmar URL Shortener
+	#VersionCode: 2
+	#VersionName: 1.0
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: False
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	'These variables can only be accessed from this module.
+	Dim edt As EditText
+	Dim b1 As Button
+	Dim cp As BClipboard
+	Dim bbg As ColorDrawable
+	Dim TinyApiUrl As String = "http://tinyurl.com/api-create.php?url="
+	Dim lt,lf As Label
+	Dim share,about As Button
+	Dim abg,sbg As BitmapDrawable
+
+	Dim B As AdView
+	Dim I As InterstitialAd
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	lt.Initialize("")
+	lt.Color = Colors.rgb(0, 150, 136)
+	lt.Gravity = Gravity.CENTER
+	lt.Text = "Myanmar URL Shortener!"
+	lt.TextColor = Colors.White
+	lt.TextSize = 17
+	lt.Typeface = Typeface.DEFAULT_BOLD
+	Activity.AddView(lt,0%x,0%y,100%x,55dip)
+	
+	abg.Initialize(LoadBitmap(File.DirAssets,"about.png"))
+	about.Initialize("about")
+	about.Background = abg
+	about.Gravity = Gravity.CENTER
+	Activity.AddView(about,10dip,12.5dip,30dip,30dip)
+	
+	sbg.Initialize(LoadBitmap(File.DirAssets,"share.png"))
+	share.Initialize("share")
+	share.Background = sbg
+	share.Gravity = Gravity.CENTER
+	Activity.AddView(share,100%x - 40dip,12.5dip,30dip,30dip)
+	
+	Activity.Color = Colors.White
+	'Do not forget to load the layout file created with the visual designer. For example:
+	'Activity.LoadLayout("Layout1")
+	edt.Initialize("edt")
+	edt.Gravity = Gravity.CENTER
+	edt.Color = Colors.DarkGray
+	edt.Hint = "Paste Your Link Here"
+	edt.TextColor = Colors.White
+	edt.HintColor = Colors.Gray
+	Activity.AddView(edt,10%x,55dip+5%y,80%x,20%y)
+
+	b1.Initialize("b1")
+	b1.Text = "Short Link!"
+	bbg.Initialize(Colors.RGB(33, 150, 243),15)
+	b1.Background = bbg
+	Activity.AddView(b1,50%x-100dip,edt.Top+edt.Height+5%y,200dip,50dip)
+
+	'Banner ADs
+	B.Initialize2("B","ca-app-pub-4173348573252986/4846246556",B.SIZE_SMART_BANNER)
+	Dim height As Int
+	If GetDeviceLayoutValues.ApproximateScreenSize < 6 Then
+		If 100%x > 100%y Then height = 32dip Else height = 50dip
+	Else
+		height = 90dip
+	End If
+	Activity.AddView(B, 0dip, 100%y - height, 100%x, height)
+	B.LoadAd
+	Log(B)
+	
+	'Interstitial Ads
+	I.Initialize("I","ca-app-pub-4173348573252986/1613578551")
+	I.LoadAd
+	If I.Ready = False Then
+		I.LoadAd
+	End If
+	
+	lf.Initialize("lf")
+	lf.Text = "Developed By Myanmar Android App"
+	lf.TextColor = Colors.Magenta
+	Activity.AddView(lf,0%x,100%y - 120dip,100%x,10%y)
+	lf.Gravity = Gravity.CENTER
+End Sub
+
+Sub lf_Click
+	Try
+ 
+		Dim Facebook As Intent
+ 
+		Facebook.Initialize(Facebook.ACTION_VIEW, "fb://page/627699334104477")
+		StartActivity(Facebook)
+ 
+	Catch
+ 
+		Dim Facebook As Intent
+		Facebook.Initialize(Facebook.ACTION_VIEW, "https://m.facebook.com/MmFreeAndroidApps")
+ 
+		StartActivity(i)
+ 
+	End Try
+End Sub
+
+Sub gd_Click
+	Dim fb As PhoneIntents
+	StartActivity(fb.OpenBrowser("http://www.myanmarandroidapp.com/p/pfree-link-generator.html"))
+End Sub
+
+Sub b1_Click
+	If edt.Text = "" Then
+		Msgbox("Please Paste Your Link","ERROR")
+	Else
+		Dim hn1 As String
+		Dim h1 As HttpJob
+		Dim su As StringUtils
+		h1.Initialize("GetTinyUrl",Me)
+		hn1 = edt.Text
+		If hn1.StartsWith("http") Or hn1.StartsWith("www") = True Then
+				h1.Download(TinyApiUrl & su.EncodeUrl(hn1,"UTF8"))
+				Log(TinyApiUrl&cp.getText)
+				ProgressDialogShow("Please Wait...")
+			Else
+			Msgbox("You pasted wrong link :/","Wrong!!!")
+			End If
+		End If
+End Sub
+
+Sub JobDone (Job As HttpJob)
+	ProgressDialogHide
+	Log("JobName = " & Job.JobName & ", Success = " & Job.Success)
+	If Job.Success = True Then
+		Select Job.JobName
+			Case "GetTinyUrl"
+				'print the result to the logs
+				Log(Job.GetString)
+				cp.setText(Job.GetString)
+				ToastMessageShow("Shortened Your Link!",True)
+				StartActivity(Finished)
+				If i.Ready Then I.Show Else I.LoadAd
+		End Select
+	Else
+		Log("Error: " & Job.ErrorMessage)
+		ToastMessageShow("Please connect Internet Connection!", True)
+	End If
+	Job.Release
+	If i.Ready Then I.Show Else I.LoadAd
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+
+Sub Activity_KeyPress (KeyCode As Int) As Boolean
+	Dim Answ As Int
+	If KeyCode = KeyCodes.KEYCODE_BACK Then
+		Answ = Msgbox2("If you want to get new updates on  Facebook? Please Like " &CRLF & "Myanmar Android App Page!","Attention!", "Yes", "", "No",LoadBitmap(File.DirAssets,"fb.png" ))
+		If Answ = DialogResponse.NEGATIVE Then
+			Return False
+		End If
+	End If
+	If Answ = DialogResponse.POSITIVE Then
+		Try
+ 
+			Dim Facebook As Intent
+ 
+			Facebook.Initialize(Facebook.ACTION_VIEW, "fb://page/627699334104477")
+			StartActivity(Facebook)
+ 
+		Catch
+ 
+			Dim Facebook As Intent
+			Facebook.Initialize(Facebook.ACTION_VIEW, "https://m.facebook.com/MmFreeAndroidApps")
+ 
+			StartActivity(Facebook)
+ 
+		End Try
+		Return False
+	End If
+End Sub
+
+Sub about_Click
+	StartActivity(Ab0ut)
+End Sub
+
+Sub share_Click
+	Dim ShareIt As Intent
+	cp.clrText
+	cp.setText("You can shorten any URL to short URL with this Myanmar URL Shortener!"&CRLF& "Download Free This App Here : http://www.myanmarandroidapp.com/search?q=Myanmar+URL+Shortener" &CRLF& "#MyanmarURLShortener")
+	ShareIt.Initialize (ShareIt.ACTION_SEND,"")
+	ShareIt.SetType ("text/plain")
+	ShareIt.PutExtra ("android.intent.extra.TEXT",cp.getText)
+	ShareIt.PutExtra ("android.intent.extra.SUBJECT","Get Free!!")
+	ShareIt.WrapAsIntentChooser("Share App Via...")
+	StartActivity (ShareIt)
+End Sub
+
+
+'Banner Ads
+Sub B_FailedToReceiveAd (ErrorCode As String)
+	Log("B failed: " & ErrorCode)
+End Sub
+Sub B_ReceiveAd
+	Log("B received")
+End Sub
+
+Sub B_AdScreenDismissed
+	Log("B Dismissed")
+End Sub
+
+'Interstitial Ads
+Sub I_AdClosed
+	I.LoadAd
+End Sub
+
+Sub I_ReceiveAd
+	Log("I Received")
+End Sub
+
+Sub I_FailedToReceiveAd (ErrorCode As String)
+	Log("I not Received - " &"Error Code: "&ErrorCode)
+	I.LoadAd
+End Sub
+
+Sub I_adopened
+	Log("I Opened")
+End Sub
